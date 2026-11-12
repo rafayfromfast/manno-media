@@ -28,5 +28,7 @@ jobs:
           if [ -z "$GH_TOKEN" ]; then echo "WORKER_DISPATCH_TOKEN is not set yet; nothing started"; exit 0; fi
           job=cycle
           if [ "$SCHEDULE" = "3 5 * * 6" ]; then job=weekly; fi
-          gh workflow run jobs.yml --repo rafayfromfast/manno-page -f job="$job"
+          # The REST call needs only the token's Actions permission (`gh workflow run` also reads the repo).
+          gh api --method POST repos/rafayfromfast/manno-page/actions/workflows/jobs.yml/dispatches \
+            -f ref=main -f "inputs[job]=$job" --silent
           echo "started a $job run"
